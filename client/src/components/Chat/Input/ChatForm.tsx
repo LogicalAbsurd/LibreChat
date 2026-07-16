@@ -412,8 +412,10 @@ const ChatForm = memo(function ChatForm({
       <div className="relative flex h-full flex-1 items-stretch md:flex-col">
         {/* Primary composer owns the selection popup so split-view doesn't double it. */}
         {index === 0 && quotesEnabled && <QuoteButton conversationId={conversationId} />}
-<div className="flex w-full flex-col">
-          {steering.enabled && <InFlightSteers conversationId={conversationId} />}
+        <div className="flex w-full flex-col">
+          {/* Run-scoped: `enabled` alone is any primary composer on a steerable
+              endpoint, so a chip that outlives the run would strand a bubble. */}
+          {steering.enabled && isSubmitting && <InFlightSteers conversationId={conversationId} />}
           <div className={cn('flex w-full items-center', isRTL && 'flex-row-reverse')}>
             <Mention
               index={index}
