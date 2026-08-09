@@ -180,6 +180,7 @@ html {
   --surface-destructive: var(--red-700);
   --surface-destructive-hover: var(--red-800);
   --surface-chat: var(--white);
+  --surface-qr: var(--white);
   --border-light: var(--gray-200);
   --border-light-alpha: 1;
   --border-medium-alt: var(--gray-300);
@@ -278,6 +279,7 @@ html {
   --surface-destructive: var(--red-800);
   --surface-destructive-hover: var(--red-900);
   --surface-chat: #3d342f;
+  --surface-qr: var(--white);
   --border-light: #574e47;
   --border-medium-alt: #6b5f56;
   --border-medium: #6b5f56;
