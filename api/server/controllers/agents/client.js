@@ -3637,6 +3637,7 @@ class AgentClient extends BaseClient {
    * @param {string} [params.model]
    * @param {OpenAIUsageMetadata} [params.usage]
    * @param {AppConfig['balance']} [params.balance]
+   * @param {AppConfig['transactions']} [params.transactions]
    * @param {string} [params.context='message']
    * @returns {Promise<void>}
    */
@@ -3644,6 +3645,7 @@ class AgentClient extends BaseClient {
     model,
     usage,
     balance,
+    transactions,
     promptTokens,
     completionTokens,
     context = 'message',
@@ -3654,6 +3656,7 @@ class AgentClient extends BaseClient {
           model,
           context,
           balance,
+          transactions,
           messageId: this.responseMessageId,
           conversationId: this.conversationId,
           user: this.user ?? this.options.req.user?.id,
@@ -3672,6 +3675,7 @@ class AgentClient extends BaseClient {
           {
             model,
             balance,
+            transactions,
             context: 'reasoning',
             messageId: this.responseMessageId,
             conversationId: this.conversationId,
