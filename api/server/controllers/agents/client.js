@@ -83,6 +83,7 @@ const db = require('~/models');
 const loadAgent = (params) => loadAgentFn(params, { getAgent: db.getAgent, getMCPServerTools });
 
 const MEMORY_INPUT_CHARS_PER_TOKEN = 8;
+const MEMORY_PROCESSING_TIMEOUT_MS = 30000;
 
 class AgentClient extends BaseClient {
   constructor(options = {}) {
@@ -540,10 +541,10 @@ class AgentClient extends BaseClient {
   /**
    * Creates a promise that resolves with the memory promise result or undefined after a timeout
    * @param {Promise<(TAttachment | null)[] | undefined>} memoryPromise - The memory promise to await
-   * @param {number} timeoutMs - Timeout in milliseconds (default: 3000)
+   * @param {number} timeoutMs - Timeout in milliseconds (default: MEMORY_PROCESSING_TIMEOUT_MS)
    * @returns {Promise<(TAttachment | null)[] | undefined>}
    */
-  async awaitMemoryWithTimeout(memoryPromise, timeoutMs = 3000) {
+  async awaitMemoryWithTimeout(memoryPromise, timeoutMs = MEMORY_PROCESSING_TIMEOUT_MS) {
     if (!memoryPromise) {
       return;
     }
@@ -557,7 +558,7 @@ class AgentClient extends BaseClient {
       return attachments;
     } catch (error) {
       if (error.message === 'Memory processing timeout') {
-        logger.warn('[AgentClient] Memory processing timed out after 3 seconds');
+        logger.warn(`[AgentClient] Memory processing timed out after ${timeoutMs}ms`);
       } else {
         logger.error('[AgentClient] Error processing memory:', error);
       }
