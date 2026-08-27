@@ -167,7 +167,6 @@ function getInterruptTtlMs(checkpointerCfg, req) {
 }
 
 const MEMORY_INPUT_CHARS_PER_TOKEN = 8;
-const MEMORY_PROCESSING_TIMEOUT_MS = 30000;
 
 function getUserFacingRequestError(baseMessage, error, appConfig) {
   const protectionEnabled = hasModelBoundContentProtection(
@@ -2283,10 +2282,10 @@ class AgentClient extends BaseClient {
   /**
    * Creates a promise that resolves with the memory promise result or undefined after a timeout
    * @param {Promise<(TAttachment | null)[] | undefined>} memoryPromise - The memory promise to await
-   * @param {number} timeoutMs - Timeout in milliseconds (default: MEMORY_PROCESSING_TIMEOUT_MS)
+   * @param {number} timeoutMs - Timeout in milliseconds (default: 3000)
    * @returns {Promise<(TAttachment | null)[] | undefined>}
    */
-  async awaitMemoryWithTimeout(memoryPromise, timeoutMs = MEMORY_PROCESSING_TIMEOUT_MS) {
+  async awaitMemoryWithTimeout(memoryPromise, timeoutMs = 3000) {
     if (!memoryPromise) {
       return;
     }
@@ -2300,7 +2299,7 @@ class AgentClient extends BaseClient {
       return attachments;
     } catch (error) {
       if (error.message === 'Memory processing timeout') {
-        logger.warn(`[AgentClient] Memory processing timed out after ${timeoutMs}ms`);
+        logger.warn('[AgentClient] Memory processing timed out after 3 seconds');
       } else {
         logger.error('[AgentClient] Error processing memory:', getSafeErrorMetadata(error));
       }

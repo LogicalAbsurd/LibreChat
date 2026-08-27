@@ -540,7 +540,6 @@ const ChatForm = memo(function ChatForm({
               placeholder="com_ui_add_model_preset"
               includeAssistants={false}
             />
-            />
             <Mention
               index={index}
               popoverAtom={mentionPopoverAtom}
