@@ -2533,3 +2533,102 @@ html[data-input-modality='keyboard']
 .sharepoint-picker-bg {
   background-color: rgb(var(--surface-dialog));
 }
+
+/* ------------------------------------------------------------------
+   Cosmic Slate — charcoal/slate ground, electric blue accent.
+   Appended last on purpose: same specificity as the .dark block
+   above, so source order decides and these win.
+   ------------------------------------------------------------------ */
+.dark {
+  /* grey ramp — every surface and text token resolves here */
+  --gray-900: 6 8 15;
+  --gray-875: 9 12 21;
+  --gray-850: 12 16 27;
+  --gray-800: 15 20 32;
+  --gray-700: 32 38 49;
+  --gray-650: 39 48 68;
+  --gray-600: 55 65 84;
+  --gray-500: 95 104 122;
+  --gray-400: 153 162 179;
+  --gray-300: 199 208 223;
+  --gray-200: 233 242 255;
+  --gray-100: 232 241 255;
+  --gray-50: 239 245 255;
+
+  /* accent */
+  --accent-primary: 45 212 255;
+  --accent-primary-hover: 91 221 255;
+  --link: 66 216 255;
+  --link-hover: 108 225 255;
+  --brand-purple: 45 212 255;
+
+  /* status */
+  --status-success: 74 222 128;
+  --status-success-subtle: 16 38 31;
+  --status-success-border: 33 94 60;
+  --status-success-strong: 43 126 77;
+  --status-info: 96 165 250;
+  --status-info-subtle: 19 30 48;
+  --status-info-border: 42 71 109;
+  --status-info-strong: 56 94 144;
+  --status-warning: 251 191 36;
+  --status-warning-subtle: 40 34 18;
+  --status-warning-border: 104 81 23;
+  --status-warning-strong: 141 109 27;
+  --status-error: 248 113 113;
+  --status-error-subtle: 40 23 29;
+  --status-error-border: 103 50 54;
+  --status-error-strong: 139 66 69;
+
+  /* submit / destructive surfaces */
+  --surface-submit: 43 126 77;
+  --surface-submit-hover: 54 158 94;
+  --surface-destructive: 127 61 64;
+  --surface-destructive-hover: 163 76 79;
+}
+
+/* Send button: the one genuinely powered thing on the screen.
+   :not(:disabled) is load-bearing — an empty composer disables the
+   button, and LibreChat's disabled styling flattens a lit one into a
+   smudge. Dim when there's nothing to say, lit when there is. */
+.dark [data-testid='send-button']:not(:disabled),
+.dark [aria-label='send-button']:not(:disabled) {
+  background-color: rgb(45 212 255) !important;
+  color: rgb(6 8 15) !important;
+  box-shadow: 0 0 5px 3px rgb(45 212 255 / 0.40) !important;
+}
+
+/* Corners. Enumerating Tailwind's rounded-* utilities misses arbitrary
+   values like rounded-[28px], which is what the composer actually uses.
+   Match the attribute instead, then re-assert rounded-full afterwards so
+   genuinely circular things stay circular. Order matters here. */
+.dark [class*='rounded'] {
+  border-radius: 1px !important;
+}
+.dark [class~='rounded-full'] {
+  border-radius: 9999px !important;
+}
+
+/* Composer. The glow rides the element that actually paints the box —
+   the overflow-hidden div holding the textarea — not the form around it,
+   which is ~15px wider and left a visible gap on each side.
+   :has(textarea) picks it out by what it contains rather than by class,
+   so a future LibreChat reshuffling its div nesting won't break this.
+   No border: the ring is a 0-blur shadow layer, so it adds no width and
+   the overflow-hidden can't clip it. */
+.dark form:has([aria-label='send-button'], [data-testid='send-button'])
+     div.overflow-hidden:has(textarea) {
+  box-shadow: 0 0 0 1px rgb(45 212 255 / 0.55),
+              0 0 9px 2px rgb(45 212 255 / 0.30) !important;
+  transition: box-shadow .18s ease !important;
+}
+.dark form:has([aria-label='send-button'], [data-testid='send-button'])
+     div.overflow-hidden:has(textarea):focus-within {
+  box-shadow: 0 0 0 1px rgb(45 212 255 / 0.95),
+              0 0 12px 4px rgb(45 212 255 / 0.35) !important;
+}
+
+/* Seam between the sidebar and the conversation. */
+.dark nav {
+  border-right: 1px solid rgb(45 212 255 / 0.22) !important;
+}
