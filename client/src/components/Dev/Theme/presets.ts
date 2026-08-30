@@ -42,6 +42,10 @@ const ramp: Record<string, RampEntry> = {
   'surface-active-alt': { light: 90, dark: 18, sat: 0.7 },
   'surface-hover': { light: 90, dark: 26, sat: 0.7 },
   'surface-hover-alt': { light: 84, dark: 26, sat: 0.7 },
+  'surface-composer-hover': { light: 90, dark: 26, sat: 0.7 },
+  'surface-overlay': { light: 50, dark: 50, sat: 0.4 },
+  'surface-code': { light: 97.5, dark: 10, sat: 0.55 },
+  'surface-qr': { light: 100, dark: 7, sat: 0.55 },
   presentation: { light: 100, dark: 13, sat: 0.55 },
   'header-primary': { light: 100, dark: 18, sat: 0.6 },
   'header-hover': { light: 97.5, dark: 26, sat: 0.65 },
@@ -63,6 +67,14 @@ const semantic: Record<string, Record<ThemeMode, string>> = {
   'border-destructive': { light: '#dc2626', dark: '#ef4444' },
   'surface-destructive': { light: '#b91c1c', dark: '#991b1b' },
   'surface-destructive-hover': { light: '#991b1b', dark: '#7f1d1d' },
+  link: { light: '#2563eb', dark: '#60a5fa' },
+  'link-hover': { light: '#1d4ed8', dark: '#93c5fd' },
+  'link-visited': { light: '#9333ea', dark: '#c084fc' },
+  'status-success': { light: '#047857', dark: '#10b981' },
+  'status-info': { light: '#2563eb', dark: '#60a5fa' },
+  'status-warning': { light: '#b45309', dark: '#f59e0b' },
+  'status-error': { light: '#b91c1c', dark: '#ef4444' },
+  'status-neutral': { light: '#424242', dark: '#999696' },
 };
 
 const MAX_TINT: Record<ThemeMode, number> = { light: 24, dark: 30 };
@@ -95,6 +107,8 @@ export function buildPalette(seed: PaletteSeed, mode: ThemeMode): Record<string,
     const submitLightness = mode === 'dark' ? 34 : 38;
     palette['surface-submit'] = hslToHex({ ...accentHsl, l: submitLightness });
     palette['surface-submit-hover'] = hslToHex({ ...accentHsl, l: submitLightness - 8 });
+    palette['accent-primary'] = hslToHex({ ...accentHsl, l: submitLightness });
+    palette['accent-primary-hover'] = hslToHex({ ...accentHsl, l: submitLightness - 8 });
   }
 
   return palette;

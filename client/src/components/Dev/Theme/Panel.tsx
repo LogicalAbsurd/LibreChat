@@ -181,9 +181,16 @@ export default function Panel({ onClose }: PanelProps) {
   }, [status]);
 
   const tokenValue = useCallback(
-    (name: string): string => state[mode][name] ?? readToken(name),
+    (name: string): string => state[mode][name] ?? hexOf(readToken(name)),
     [state, mode],
   );
+
+  const groups = useMemo(() => {
+    const defined = (name: string): boolean => readToken(name) !== '';
+    return colorGroups
+      .map((group) => ({ ...group, tokens: group.tokens.filter((token) => defined(token.name)) }))
+      .filter((group) => group.tokens.length > 0);
+  }, []);
 
   const contrast = useMemo(() => {
     const surface = tokenValue('surface-primary');
@@ -414,7 +421,7 @@ export default function Panel({ onClose }: PanelProps) {
 
           <div className="tl-section">
             <span className="tl-label">Tokens — {mode} mode</span>
-            {colorGroups.map((group) => {
+            {groups.map((group) => {
               const isOpen = openGroups[group.id] === true;
               return (
                 <div key={group.id}>
