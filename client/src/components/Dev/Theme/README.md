@@ -76,6 +76,26 @@ persisted in `localStorage`, so they survive a reload. Nothing is sent anywhere.
   environment variables.
 - **Reset** removes the override stylesheet and the stored state.
 
+## Radius and accent coverage
+
+Two host details the lab has to work around:
+
+**Radius.** Only `rounded-lg`, `rounded-md` and `rounded-sm` read `--radius`;
+`rounded-xl`, `rounded-2xl` and bare `rounded` are Tailwind literals, and newer
+trees add `--theme-control-radius` / `--theme-surface-radius` in a preset. Moving
+`--radius` alone leaves most of the UI unchanged, so the slider restates the
+whole scale proportionally and sets the theme radius variables too.
+`rounded-full` and `rounded-none` are deliberate shapes — avatars, pills, flush
+edges — and are left alone.
+
+**Accent.** LibreChat is mostly neutral surfaces, so the accent lands on a
+limited set of elements: `text-accent-primary`, `bg-surface-submit`, links and
+the focus ring. Most of what you see when you move the accent is the hue tint on
+the neutrals. Because those accent tokens are used as _text_ far more than as
+fills, generated accents and links are walked away from `surface-primary` until
+they clear 4.5:1 — a fixed lightness cannot guarantee that, since a green and a
+blue at the same HSL lightness are nowhere near equally readable.
+
 ## Channel formats
 
 LibreChat stores its semantic tokens as bare `R G B` channel triplets

@@ -133,9 +133,9 @@ export const effectControls: EffectControl[] = [
   {
     id: 'radius',
     label: 'Corner radius',
-    hint: 'Drives --radius, used by rounded-lg / md / sm.',
+    hint: 'Rescales the whole radius scale. Pills and avatars keep their shape.',
     min: 0,
-    max: 1.75,
+    max: 1.5,
     step: 0.05,
     neutral: 0.5,
     unit: 'rem',

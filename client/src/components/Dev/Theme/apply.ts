@@ -38,6 +38,8 @@ export function detectChannelFormat(): ChannelFormat {
 const colorRef = (name: string, format: ChannelFormat): string =>
   format === 'triplet' ? `rgb(var(--${name}))` : `var(--${name})`;
 
+const round = (value: number): number => Math.round(value * 1000) / 1000;
+
 const isNeutral = (id: EffectId, value: number): boolean =>
   Math.abs(value - neutralEffects[id]) < 1e-6;
 
@@ -70,13 +72,46 @@ function paletteRules(state: LabState, important: boolean, format: ChannelFormat
   return rules;
 }
 
+/**
+ * Tailwind's radius scale, as multiples of `rounded-lg`. Only `lg`, `md` and
+ * `sm` are wired to `--radius`; the rest are literals, so the slider has to
+ * restate them or most of the UI ignores it. `full` and `none` are deliberate
+ * shapes (avatars, pills, flush edges) and are left alone.
+ */
+const RADIUS_SCALE: ReadonlyArray<readonly [string, number]> = [
+  ['sm', 0.25],
+  ['', 0.5],
+  ['md', 0.75],
+  ['lg', 1],
+  ['xl', 1.5],
+  ['2xl', 2],
+  ['3xl', 3],
+];
+
+/** Radius variables the app's own theme layer reads, with their default ratios. */
+const RADIUS_VARS: ReadonlyArray<readonly [string, number]> = [
+  ['radius', 1],
+  ['theme-control-radius', 1.5],
+  ['theme-surface-radius', 2],
+  ['theme-large-surface-radius', 3],
+];
+
+const radiusVars = (radius: number, suffix: string): string[] =>
+  RADIUS_VARS.map(([name, ratio]) => `  --${name}: ${round(radius * ratio)}rem${suffix};`);
+
+const radiusRules = (radius: number, suffix: string): string[] =>
+  RADIUS_SCALE.map(([step, ratio]) => {
+    const selector = step ? `.rounded-${step}` : '.rounded';
+    return `${selector} {\n  border-radius: ${round(radius * ratio)}rem${suffix};\n}`;
+  });
+
 function effectRules(effects: EffectValues, important: boolean, format: ChannelFormat): string[] {
   const suffix = important ? ' !important' : '';
   const rules: string[] = [];
   const rootVars: string[] = [];
 
   if (!isNeutral('radius', effects.radius)) {
-    rootVars.push(`  --radius: ${effects.radius}rem${suffix};`);
+    rootVars.push(...radiusVars(effects.radius, suffix));
   }
 
   if (!isNeutral('motion', effects.motion)) {
@@ -95,6 +130,10 @@ function effectRules(effects: EffectValues, important: boolean, format: ChannelF
 
   if (rootVars.length) {
     rules.push(`html {\n${rootVars.join('\n')}\n}`);
+  }
+
+  if (!isNeutral('radius', effects.radius)) {
+    rules.push(...radiusRules(effects.radius, suffix));
   }
 
   const filters: string[] = [];

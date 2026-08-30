@@ -176,6 +176,37 @@ export function contrastRatio(foreground: string, background: string): number | 
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/**
+ * Walks a colour's lightness away from a background until it clears the given
+ * contrast ratio. Fixed lightness cannot guarantee contrast on its own, because
+ * perceived brightness varies sharply by hue — a green and a blue at the same
+ * HSL lightness are nowhere near equally readable.
+ */
+export function ensureContrast(color: string, background: string, target: number): string {
+  const hsl = hexToHsl(color);
+  const bg = parseColor(background);
+  if (!hsl || !bg) {
+    return color;
+  }
+
+  const darken = relativeLuminance(bg) > 0.18;
+  let candidate = color;
+
+  for (let step = 0; step <= 100; step += 1) {
+    const lightness = clamp(darken ? hsl.l - step : hsl.l + step, 0, 100);
+    candidate = hslToHex({ ...hsl, l: lightness });
+    const ratio = contrastRatio(candidate, background);
+    if (ratio !== null && ratio >= target) {
+      return candidate;
+    }
+    if (lightness === 0 || lightness === 100) {
+      break;
+    }
+  }
+
+  return candidate;
+}
+
 export const shiftLightness = (hex: string, delta: number): string => {
   const hsl = hexToHsl(hex);
   return hsl ? hslToHex({ ...hsl, l: clamp(hsl.l + delta, 0, 100) }) : hex;
