@@ -12,6 +12,7 @@ import QueryDevtoolsGate from '~/components/QueryDevtoolsGate';
 import LanguageSync from '~/components/System/LanguageSync';
 import { getThemeFromEnv } from './utils/getThemeFromEnv';
 import { initializeFontSize } from '~/store/fontSize';
+import ThemeLab from '~/components/Dev/Theme';
 import { LiveAnnouncer } from '~/a11y';
 import { router } from './routes';
 
@@ -67,6 +68,7 @@ const App = () => {
                   <RouterProvider router={router} />
                   <WakeLockManager />
                   <QueryDevtoolsGate />
+                  <ThemeLab />
                   <Toast />
                   <RadixToast.Viewport className="pointer-events-none fixed inset-0 z-[1000] mx-auto my-2 flex max-w-[560px] flex-col items-stretch justify-start md:pb-5" />
                 </DndProvider>
