@@ -4,6 +4,24 @@ An in-app playground for LibreChat's colours and visual effects. It edits the sa
 CSS custom properties that `client/src/style.css` defines, so whatever you see in
 the panel is the real UI, not a mockup.
 
+## Running it against your own backend
+
+The lab lives in the frontend, so you view it through the Vite dev server rather
+than through the port your backend serves. Start the dev server with
+`BACKEND_PORT` pointing at your running LibreChat:
+
+```bash
+BACKEND_PORT=3081 npm run frontend:dev
+```
+
+Then open <http://localhost:3090>. That page is your real LibreChat — same
+backend, same login, same conversations — with the lab available on top.
+
+`BACKEND_PORT` defaults to `3080` (`client/vite.config.ts`). If it points at a
+port with nothing behind it, `/api/config` fails and the login page renders with
+no fields at all, because `Login.tsx` gates every field on `startupConfig`. An
+empty login page almost always means the proxy is aimed at the wrong port.
+
 ## Opening it
 
 The lab is mounted in `App.jsx` and renders only in development builds.
