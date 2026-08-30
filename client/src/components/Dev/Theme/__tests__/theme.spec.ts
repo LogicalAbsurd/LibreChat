@@ -97,6 +97,43 @@ describe('buildPalette', () => {
     expect(light!.l).toBeGreaterThan(dark!.l);
   });
 
+  it('ties link colours to the accent hue', () => {
+    const seed = { accent: '#e11d48', tint: 0.3, contrast: 0.5 };
+    const accentHue = hexToHsl(seed.accent)!.h;
+    for (const mode of ['light', 'dark'] as const) {
+      const link = hexToHsl(buildPalette(seed, mode)['link'])!;
+      expect(Math.abs(link.h - accentHue)).toBeLessThan(2);
+    }
+  });
+
+  it('keeps accent text readable against the primary surface', () => {
+    for (const preset of presets) {
+      for (const mode of ['light', 'dark'] as const) {
+        const palette = buildPalette(preset.seed, mode);
+        const ratio = contrastRatio(palette['accent-primary'], palette['surface-primary'])!;
+        expect({ preset: preset.id, mode, ok: ratio >= 4.5 }).toEqual({
+          preset: preset.id,
+          mode,
+          ok: true,
+        });
+      }
+    }
+  });
+
+  it('keeps link text readable against the primary surface', () => {
+    for (const preset of presets) {
+      for (const mode of ['light', 'dark'] as const) {
+        const palette = buildPalette(preset.seed, mode);
+        const ratio = contrastRatio(palette['link'], palette['surface-primary'])!;
+        expect({ preset: preset.id, mode, ok: ratio >= 4.5 }).toEqual({
+          preset: preset.id,
+          mode,
+          ok: true,
+        });
+      }
+    }
+  });
+
   it('produces achromatic neutrals when tint is zero', () => {
     const palette = buildPalette({ accent: '#737373', hue: 0, tint: 0, contrast: 0.5 }, 'dark');
     expect(hexToHsl(palette['surface-primary'])!.s).toBeCloseTo(0, 5);
@@ -147,6 +184,25 @@ describe('buildCss', () => {
   it('drops values it cannot parse rather than emitting broken CSS', () => {
     const broken = { ...emptyState(), light: { 'surface-primary': '#ab' } };
     expect(buildCss(broken, false, 'triplet')).toBe('');
+  });
+
+  it('rescales every radius step, not just the ones wired to --radius', () => {
+    const base = emptyState();
+    const css = buildCss({ ...base, effects: { ...base.effects, radius: 1 } }, false);
+
+    expect(css).toContain('--radius: 1rem;');
+    expect(css).toContain('--theme-control-radius: 1.5rem;');
+    expect(css).toContain('--theme-surface-radius: 2rem;');
+    expect(css).toContain('.rounded-xl {');
+    expect(css).toContain('.rounded-2xl {');
+    expect(css).toContain('border-radius: 1.5rem;');
+  });
+
+  it('leaves deliberate shapes alone', () => {
+    const base = emptyState();
+    const css = buildCss({ ...base, effects: { ...base.effects, radius: 1 } }, false);
+    expect(css).not.toContain('.rounded-full');
+    expect(css).not.toContain('.rounded-none');
   });
 
   it('emits effect rules only when a control leaves its neutral value', () => {

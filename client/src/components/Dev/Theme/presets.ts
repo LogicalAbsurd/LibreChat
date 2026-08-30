@@ -1,6 +1,6 @@
 import type { ThemeMode } from './tokens';
 
-import { clamp, hexToHsl, hslToHex } from './color';
+import { clamp, ensureContrast, hexToHsl, hslToHex } from './color';
 
 export interface PaletteSeed {
   /** Accent colour as hex; drives brand, focus ring and submit surfaces. */
@@ -67,9 +67,6 @@ const semantic: Record<string, Record<ThemeMode, string>> = {
   'border-destructive': { light: '#dc2626', dark: '#ef4444' },
   'surface-destructive': { light: '#b91c1c', dark: '#991b1b' },
   'surface-destructive-hover': { light: '#991b1b', dark: '#7f1d1d' },
-  link: { light: '#2563eb', dark: '#60a5fa' },
-  'link-hover': { light: '#1d4ed8', dark: '#93c5fd' },
-  'link-visited': { light: '#9333ea', dark: '#c084fc' },
   'status-success': { light: '#047857', dark: '#10b981' },
   'status-info': { light: '#2563eb', dark: '#60a5fa' },
   'status-warning': { light: '#b45309', dark: '#f59e0b' },
@@ -78,6 +75,9 @@ const semantic: Record<string, Record<ThemeMode, string>> = {
 };
 
 const MAX_TINT: Record<ThemeMode, number> = { light: 24, dark: 30 };
+
+/** WCAG AA for body text; accent tokens are used as text far more than as fills. */
+const TEXT_CONTRAST = 4.5;
 
 /** Builds a full semantic palette for one mode from a single seed. */
 export function buildPalette(seed: PaletteSeed, mode: ThemeMode): Record<string, string> {
@@ -109,6 +109,20 @@ export function buildPalette(seed: PaletteSeed, mode: ThemeMode): Record<string,
     palette['surface-submit-hover'] = hslToHex({ ...accentHsl, l: submitLightness - 8 });
     palette['accent-primary'] = hslToHex({ ...accentHsl, l: submitLightness });
     palette['accent-primary-hover'] = hslToHex({ ...accentHsl, l: submitLightness - 8 });
+
+    const surface = palette['surface-primary'];
+    const readable = (hex: string): string => ensureContrast(hex, surface, TEXT_CONTRAST);
+
+    palette['accent-primary'] = readable(palette['accent-primary']);
+    palette['accent-primary-hover'] = readable(palette['accent-primary-hover']);
+
+    const linkLightness = mode === 'dark' ? 66 : 42;
+    const linkShift = mode === 'dark' ? 10 : -8;
+    palette['link'] = readable(hslToHex({ ...accentHsl, l: linkLightness }));
+    palette['link-hover'] = readable(hslToHex({ ...accentHsl, l: linkLightness + linkShift }));
+    palette['link-visited'] = readable(
+      hslToHex({ ...accentHsl, h: accentHsl.h + 30, l: linkLightness }),
+    );
   }
 
   return palette;
