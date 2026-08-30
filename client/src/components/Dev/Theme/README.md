@@ -88,6 +88,13 @@ whole scale proportionally and sets the theme radius variables too.
 `rounded-full` and `rounded-none` are deliberate shapes — avatars, pills, flush
 edges — and are left alone.
 
+If a slider looks dead, check for a more specific `!important` rule in your own
+`style.css`. An author rule like `.dark [class*='rounded']` has specificity
+(0,2,0) against the lab's (0,1,0), so it wins regardless of what the lab emits.
+The panel now detects this for corner radius and says so rather than looking
+broken; the lab deliberately does not escalate specificity to fight your own
+customizations.
+
 **Accent.** LibreChat is mostly neutral surfaces, so the accent lands on a
 limited set of elements: `text-accent-primary`, `bg-surface-submit`, links and
 the focus ring. Most of what you see when you move the accent is the hue tint on

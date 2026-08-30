@@ -226,6 +226,29 @@ export function applyState(state: LabState): void {
   element.textContent = buildCss(state, true, detectChannelFormat());
 }
 
+/**
+ * Measures whether an author rule outranks the lab's radius override. A more
+ * specific `!important` rule — LibreChat trees often carry hand-written ones
+ * like `.dark [class*='rounded']` — silently wins, which reads as a dead
+ * slider unless the panel says so.
+ */
+export function radiusOverridden(radius: number): boolean {
+  const probe = document.createElement('div');
+  probe.className = 'rounded-xl';
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:0;height:0';
+  document.body.appendChild(probe);
+  const actual = parseFloat(getComputedStyle(probe).borderTopLeftRadius);
+  probe.remove();
+
+  if (!Number.isFinite(actual)) {
+    return false;
+  }
+
+  const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  return Math.abs(actual - radius * 1.5 * rootSize) > 0.5;
+}
+
 export function clearOverrides(): void {
   document.getElementById(STYLE_ID)?.remove();
 }
