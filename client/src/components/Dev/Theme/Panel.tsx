@@ -5,7 +5,14 @@ import type { EffectId, ThemeMode } from './tokens';
 import type { PaletteSeed } from './presets';
 import type { LabState } from './apply';
 
-import { activeMode, applyState, clearOverrides, exportCss, readToken } from './apply';
+import {
+  activeMode,
+  applyState,
+  clearOverrides,
+  exportCss,
+  radiusOverridden,
+  readToken,
+} from './apply';
 import { clearState, emptyState, loadState, saveState, stateFromSeed } from './store';
 import { colorGroups, effectControls, neutralEffects } from './tokens';
 import { contrastRatio, parseColor, toHex } from './color';
@@ -160,10 +167,14 @@ export default function Panel({ onClose }: PanelProps) {
   const [dock, setDock] = useState<'left' | 'right'>('right');
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ brand: true });
   const [status, setStatus] = useState('');
+  const [radiusBlocked, setRadiusBlocked] = useState(false);
 
   useEffect(() => {
     applyState(state);
     saveState(state);
+    setRadiusBlocked(
+      state.effects.radius !== neutralEffects.radius && radiusOverridden(state.effects.radius),
+    );
   }, [state]);
 
   useEffect(() => {
@@ -405,6 +416,13 @@ export default function Panel({ onClose }: PanelProps) {
                 />
               </div>
             ))}
+            {radiusBlocked && (
+              <p className="tl-note tl-fail" role="status">
+                Corner radius is applying but something outranks it — usually a more specific
+                `!important` rule in style.css, such as `.dark [class*=&apos;rounded&apos;]`. Remove
+                or loosen that rule to preview radius changes.
+              </p>
+            )}
             <p className="tl-note">
               Saturation, contrast and hue rotate filter the whole app, which makes #root a
               containing block for fixed-position children — check overlays before shipping them.
