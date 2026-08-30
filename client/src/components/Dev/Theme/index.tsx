@@ -74,19 +74,24 @@ export default function ThemeLab({ isDevelopment }: ThemeLabProps = {}) {
           right: '16px',
           bottom: '16px',
           zIndex: 2147483000,
-          width: '34px',
-          height: '34px',
-          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '8px 14px',
+          borderRadius: '999px',
           border: '1px solid #34343c',
           background: '#17171a',
           color: '#e6e6e9',
-          fontSize: '15px',
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fontSize: '12px',
+          fontWeight: 600,
           lineHeight: 1,
           cursor: 'pointer',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
         }}
       >
-        🎨
+        <span aria-hidden="true">🎨</span>
+        Theme Lab
       </button>
     );
   }
