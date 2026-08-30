@@ -76,6 +76,27 @@ persisted in `localStorage`, so they survive a reload. Nothing is sent anywhere.
   environment variables.
 - **Reset** removes the override stylesheet and the stored state.
 
+## Channel formats
+
+LibreChat stores its semantic tokens as bare `R G B` channel triplets
+(`--surface-primary: 255 255 255`) so Tailwind can wrap them as
+`rgb(var(--x) / <alpha-value>)` and opacity modifiers keep working. Older trees
+stored plain colours instead.
+
+The lab detects which convention the running app uses by probing a palette
+variable it never overrides (`--white`, `--black`, `--gray-800`) and emits
+matching values, so writing hex into a triplet host — which produces invalid
+`rgb(#aabbcc / 1)` and silently strips the colour from every element — cannot
+happen. Effect CSS adapts too: token references become `rgb(var(--x))` where the
+host uses triplets.
+
+Colours are held internally as hex because that is what colour inputs speak; the
+conversion happens when the stylesheet is written.
+
+The token list is a superset across LibreChat versions. On mount the panel hides
+any token the running app does not define, so you only ever see controls that do
+something.
+
 ## Layout
 
 | File         | Role                                                                 |

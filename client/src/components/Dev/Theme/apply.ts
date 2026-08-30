@@ -1,6 +1,8 @@
 import type { EffectId, EffectValues, ThemeMode } from './tokens';
+import type { ChannelFormat } from './color';
 import type { PaletteSeed } from './presets';
 
+import { formatColor, isTriplet, parseColor } from './color';
 import { motionTokens, neutralEffects } from './tokens';
 
 export interface LabState {
@@ -13,18 +15,51 @@ export interface LabState {
 const STYLE_ID = 'librechat-theme-lab';
 const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")`;
 
+/**
+ * Palette variables the lab never overrides, so their live value still reveals
+ * how the host app stores colour channels.
+ */
+const FORMAT_PROBES = ['white', 'black', 'gray-800'];
+
+export function detectChannelFormat(): ChannelFormat {
+  for (const probe of FORMAT_PROBES) {
+    const raw = readToken(probe);
+    if (isTriplet(raw)) {
+      return 'triplet';
+    }
+    if (raw && parseColor(raw)) {
+      return 'hex';
+    }
+  }
+  return 'hex';
+}
+
+/** Wraps a token reference so it reads as a colour in either channel format. */
+const colorRef = (name: string, format: ChannelFormat): string =>
+  format === 'triplet' ? `rgb(var(--${name}))` : `var(--${name})`;
+
 const isNeutral = (id: EffectId, value: number): boolean =>
   Math.abs(value - neutralEffects[id]) < 1e-6;
 
-function declarations(overrides: Record<string, string>, important: boolean): string[] {
+function declarations(
+  overrides: Record<string, string>,
+  important: boolean,
+  format: ChannelFormat,
+): string[] {
   const suffix = important ? ' !important' : '';
-  return Object.entries(overrides).map(([name, value]) => `  --${name}: ${value}${suffix};`);
+  return Object.entries(overrides).flatMap(([name, value]) => {
+    const rgb = parseColor(value);
+    if (!rgb) {
+      return [];
+    }
+    return [`  --${name}: ${formatColor(rgb, format)}${suffix};`];
+  });
 }
 
-function paletteRules(state: LabState, important: boolean): string[] {
+function paletteRules(state: LabState, important: boolean, format: ChannelFormat): string[] {
   const rules: string[] = [];
-  const light = declarations(state.light, important);
-  const dark = declarations(state.dark, important);
+  const light = declarations(state.light, important, format);
+  const dark = declarations(state.dark, important, format);
 
   if (light.length) {
     rules.push(`html:not(.dark) {\n${light.join('\n')}\n}`);
@@ -35,7 +70,7 @@ function paletteRules(state: LabState, important: boolean): string[] {
   return rules;
 }
 
-function effectRules(effects: EffectValues, important: boolean): string[] {
+function effectRules(effects: EffectValues, important: boolean, format: ChannelFormat): string[] {
   const suffix = important ? ' !important' : '';
   const rules: string[] = [];
   const rootVars: string[] = [];
@@ -81,7 +116,7 @@ function effectRules(effects: EffectValues, important: boolean): string[] {
     const strength = Math.round(effects.glow * 70);
     rules.push(
       '#root :is(button, a, [role="button"], input, textarea, select):is(:hover, :focus-visible) {\n' +
-        `  box-shadow: 0 0 ${spread}px color-mix(in srgb, var(--brand-purple) ${strength}%, transparent)${suffix};\n` +
+        `  box-shadow: 0 0 ${spread}px color-mix(in srgb, ${colorRef('brand-purple', format)} ${strength}%, transparent)${suffix};\n` +
         '}',
     );
   }
@@ -91,7 +126,7 @@ function effectRules(effects: EffectValues, important: boolean): string[] {
     rules.push(
       '#root :is([role="dialog"], [role="menu"], [role="listbox"], [data-radix-popper-content-wrapper] > *) {\n' +
         `  backdrop-filter: blur(${effects.glass}px)${suffix};\n` +
-        `  background-color: color-mix(in srgb, var(--surface-dialog) ${opacity}%, transparent)${suffix};\n` +
+        `  background-color: color-mix(in srgb, ${colorRef('surface-dialog', format)} ${opacity}%, transparent)${suffix};\n` +
         '}',
     );
   }
@@ -106,7 +141,7 @@ function effectRules(effects: EffectValues, important: boolean): string[] {
         '  z-index: 9997;\n' +
         '  mix-blend-mode: soft-light;\n' +
         `  opacity: ${effects.wash};\n` +
-        '  background: radial-gradient(120% 80% at 50% 0%, var(--brand-purple) 0%, transparent 70%);\n' +
+        `  background: radial-gradient(120% 80% at 50% 0%, ${colorRef('brand-purple', format)} 0%, transparent 70%);\n` +
         '}',
     );
   }
@@ -128,8 +163,15 @@ function effectRules(effects: EffectValues, important: boolean): string[] {
   return rules;
 }
 
-export function buildCss(state: LabState, important: boolean): string {
-  return [...paletteRules(state, important), ...effectRules(state.effects, important)].join('\n\n');
+export function buildCss(
+  state: LabState,
+  important: boolean,
+  format: ChannelFormat = 'hex',
+): string {
+  return [
+    ...paletteRules(state, important, format),
+    ...effectRules(state.effects, important, format),
+  ].join('\n\n');
 }
 
 /** Writes the lab's overrides into a single managed <style> element. */
@@ -142,7 +184,7 @@ export function applyState(state: LabState): void {
     document.head.appendChild(element);
   }
 
-  element.textContent = buildCss(state, true);
+  element.textContent = buildCss(state, true, detectChannelFormat());
 }
 
 export function clearOverrides(): void {
@@ -162,7 +204,7 @@ export function exportCss(state: LabState): string {
     '/* Generated by the LibreChat Theme Lab.',
     '   Paste into client/src/style.css, after the existing html / .dark blocks. */',
     '',
-    buildCss(state, false),
+    buildCss(state, false, detectChannelFormat()),
     '',
   ].join('\n');
 }

@@ -18,6 +18,8 @@ export const colorGroups: ColorGroup[] = [
     label: 'Brand & accent',
     tokens: [
       { name: 'brand-purple', label: 'Brand' },
+      { name: 'accent-primary', label: 'Accent' },
+      { name: 'accent-primary-hover', label: 'Accent hover' },
       { name: 'ring-primary', label: 'Focus ring' },
       { name: 'surface-submit', label: 'Submit' },
       { name: 'surface-submit-hover', label: 'Submit hover' },
@@ -35,6 +37,9 @@ export const colorGroups: ColorGroup[] = [
       { name: 'text-tertiary', label: 'Tertiary' },
       { name: 'text-warning', label: 'Warning' },
       { name: 'text-destructive', label: 'Destructive' },
+      { name: 'link', label: 'Link' },
+      { name: 'link-hover', label: 'Link hover' },
+      { name: 'link-visited', label: 'Link visited' },
     ],
   },
   {
@@ -54,6 +59,10 @@ export const colorGroups: ColorGroup[] = [
       { name: 'surface-active-alt', label: 'Active alt' },
       { name: 'surface-hover', label: 'Hover' },
       { name: 'surface-hover-alt', label: 'Hover alt' },
+      { name: 'surface-composer-hover', label: 'Composer hover' },
+      { name: 'surface-overlay', label: 'Overlay' },
+      { name: 'surface-code', label: 'Code' },
+      { name: 'surface-qr', label: 'QR' },
       { name: 'presentation', label: 'Presentation' },
     ],
   },
@@ -76,6 +85,17 @@ export const colorGroups: ColorGroup[] = [
       { name: 'border-heavy', label: 'Heavy' },
       { name: 'border-xheavy', label: 'Extra heavy' },
       { name: 'border-destructive', label: 'Destructive' },
+    ],
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    tokens: [
+      { name: 'status-success', label: 'Success' },
+      { name: 'status-info', label: 'Info' },
+      { name: 'status-warning', label: 'Warning' },
+      { name: 'status-error', label: 'Error' },
+      { name: 'status-neutral', label: 'Neutral' },
     ],
   },
 ];

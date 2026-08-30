@@ -16,8 +16,19 @@ const clamp = (value: number, min: number, max: number): number =>
 const HEX_SHORT = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i;
 const HEX_LONG = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i;
 const FUNCTIONAL = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i;
+const TRIPLET = /^(\d{1,3})\s+(\d{1,3})\s+(\d{1,3})$/;
 
-/** Parses hex, `rgb(r g b)`, `rgb(r, g, b)` and `rgba(...)` into channel values. */
+/**
+ * How the host app stores colour channels. LibreChat moved its semantic tokens
+ * to bare `R G B` triplets so Tailwind can wrap them as
+ * `rgb(var(--x) / <alpha-value>)`; older trees still hold plain colours.
+ */
+export type ChannelFormat = 'hex' | 'triplet';
+
+/** True for a bare `R G B` channel triplet, e.g. `255 255 255`. */
+export const isTriplet = (value: string): boolean => TRIPLET.test(value.trim());
+
+/** Parses hex, bare `R G B`, `rgb(r g b)`, `rgb(r, g, b)` and `rgba(...)`. */
 export function parseColor(value: string): RGB | null {
   const input = value.trim();
   if (!input) {
@@ -42,6 +53,15 @@ export function parseColor(value: string): RGB | null {
     };
   }
 
+  const triplet = input.match(TRIPLET);
+  if (triplet) {
+    const channels = [triplet[1], triplet[2], triplet[3]].map((value) => Number(value));
+    if (channels.every((value) => value <= 255)) {
+      return { r: channels[0], g: channels[1], b: channels[2] };
+    }
+    return null;
+  }
+
   const functional = input.match(FUNCTIONAL);
   if (functional) {
     return {
@@ -58,6 +78,15 @@ export function toHex({ r, g, b }: RGB): string {
   const channel = (value: number): string =>
     clamp(Math.round(value), 0, 255).toString(16).padStart(2, '0');
   return `#${channel(r)}${channel(g)}${channel(b)}`;
+}
+
+/** Renders a colour in whichever channel format the host app expects. */
+export function formatColor(rgb: RGB, format: ChannelFormat): string {
+  if (format !== 'triplet') {
+    return toHex(rgb);
+  }
+  const channel = (value: number): number => clamp(Math.round(value), 0, 255);
+  return `${channel(rgb.r)} ${channel(rgb.g)} ${channel(rgb.b)}`;
 }
 
 export function rgbToHsl({ r, g, b }: RGB): HSL {

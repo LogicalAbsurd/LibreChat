@@ -2,7 +2,15 @@ import { buildCss } from '../apply';
 import { colorTokenNames } from '../tokens';
 import { buildPalette, presets } from '../presets';
 import { emptyState, stateFromSeed } from '../store';
-import { contrastRatio, hexToHsl, parseColor, rgbToHsl, toHex } from '../color';
+import {
+  contrastRatio,
+  formatColor,
+  hexToHsl,
+  isTriplet,
+  parseColor,
+  rgbToHsl,
+  toHex,
+} from '../color';
 
 describe('color parsing', () => {
   it('parses short hex, long hex and functional notation', () => {
@@ -13,9 +21,27 @@ describe('color parsing', () => {
     expect(parseColor('rgba(33, 33, 33, 0.5)')).toEqual({ r: 33, g: 33, b: 33 });
   });
 
+  it('parses the bare R G B triplets LibreChat stores tokens as', () => {
+    expect(parseColor('255 255 255')).toEqual({ r: 255, g: 255, b: 255 });
+    expect(parseColor('33 33 33')).toEqual({ r: 33, g: 33, b: 33 });
+    expect(isTriplet('126 34 206')).toBe(true);
+    expect(isTriplet('#7e22ce')).toBe(false);
+    expect(isTriplet('var(--gray-800)')).toBe(false);
+  });
+
+  it('rejects out-of-range triplets', () => {
+    expect(parseColor('300 0 0')).toBeNull();
+  });
+
   it('returns null for values it cannot read', () => {
     expect(parseColor('')).toBeNull();
     expect(parseColor('var(--gray-800)')).toBeNull();
+  });
+
+  it('renders channels in either host format', () => {
+    const rgb = parseColor('#7e22ce')!;
+    expect(formatColor(rgb, 'hex')).toBe('#7e22ce');
+    expect(formatColor(rgb, 'triplet')).toBe('126 34 206');
   });
 
   it('round-trips through HSL', () => {
@@ -103,6 +129,24 @@ describe('buildCss', () => {
 
   it('emits nothing for an untouched state', () => {
     expect(buildCss(emptyState(), false)).toBe('');
+  });
+
+  it('emits triplets, not hex, for a channel-triplet host', () => {
+    const css = buildCss(state, false, 'triplet');
+    expect(css).toMatch(/--surface-primary: \d{1,3} \d{1,3} \d{1,3};/);
+    expect(css).not.toContain('#');
+  });
+
+  it('wraps token references so effects stay valid in triplet hosts', () => {
+    const glow = { ...emptyState(), effects: { ...emptyState().effects, glow: 0.5 } };
+    expect(buildCss(glow, false, 'triplet')).toContain('rgb(var(--brand-purple))');
+    expect(buildCss(glow, false, 'hex')).toContain('var(--brand-purple)');
+    expect(buildCss(glow, false, 'hex')).not.toContain('rgb(var(--brand-purple))');
+  });
+
+  it('drops values it cannot parse rather than emitting broken CSS', () => {
+    const broken = { ...emptyState(), light: { 'surface-primary': '#ab' } };
+    expect(buildCss(broken, false, 'triplet')).toBe('');
   });
 
   it('emits effect rules only when a control leaves its neutral value', () => {
