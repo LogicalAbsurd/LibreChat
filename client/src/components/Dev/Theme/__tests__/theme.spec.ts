@@ -228,6 +228,15 @@ describe('buildCss', () => {
     expect(css).not.toContain('.rounded');
   });
 
+  it('publishes motion tokens for both hand-written CSS and Tailwind utilities', () => {
+    const base = emptyState();
+    const css = buildCss({ ...base, effects: { ...base.effects, motion: 2 } }, false);
+    expect(css).toContain('--resize-dur: 600ms;');
+    expect(css).toContain('--theme-motion-fast: 300ms;');
+    expect(css).toContain('--theme-motion-normal: 400ms;');
+    expect(css).toContain('--theme-motion-slow: 600ms;');
+  });
+
   it('emits effect rules only when a control leaves its neutral value', () => {
     const base = emptyState();
     expect(buildCss(base, false)).not.toContain('--radius');

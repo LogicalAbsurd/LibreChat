@@ -111,10 +111,6 @@ function effectRules(effects: EffectValues, important: boolean, format: ChannelF
     }
   }
 
-  if (!isNeutral('avatarLift', effects.avatarLift)) {
-    rootVars.push(`  --avatar-lift: ${effects.avatarLift}px${suffix};`);
-  }
-
   if (!isNeutral('iconBlur', effects.iconBlur)) {
     rootVars.push(`  --icon-swap-blur: ${effects.iconBlur}px${suffix};`);
   }

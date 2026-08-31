@@ -110,6 +110,12 @@ module.exports = {
         '3xl': 'var(--radius-3xl, 1.5rem)',
         full: '9999px',
       },
+      transitionDuration: {
+        DEFAULT: 'var(--theme-motion-normal, 150ms)',
+        150: 'var(--theme-motion-fast, 150ms)',
+        200: 'var(--theme-motion-normal, 200ms)',
+        300: 'var(--theme-motion-slow, 300ms)',
+      },
     },
   },
   plugins: [

@@ -53,8 +53,8 @@ surface, border and text token from it:
 against `surface-primary`. AA body text needs 4.5:1.
 
 **Effects** — corner radius, motion speed, saturation, contrast, hue rotate,
-accent glow, glass blur, film grain and accent wash, plus the existing
-`--avatar-lift` and `--icon-swap-blur` transition tokens.
+accent glow, glass blur, film grain, accent wash and the `--icon-swap-blur`
+transition token.
 
 Note that saturation, contrast and hue rotate apply a CSS `filter` to `#root`,
 which makes it a containing block for fixed-position descendants. Overlays

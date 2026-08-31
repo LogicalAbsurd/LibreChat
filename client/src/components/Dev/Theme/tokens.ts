@@ -114,7 +114,6 @@ export type EffectId =
   | 'glass'
   | 'grain'
   | 'wash'
-  | 'avatarLift'
   | 'iconBlur';
 
 export interface EffectControl {
@@ -221,16 +220,6 @@ export const effectControls: EffectControl[] = [
     unit: '',
   },
   {
-    id: 'avatarLift',
-    label: 'Avatar lift',
-    hint: 'Travel of the avatar-row hover lift (--avatar-lift).',
-    min: -12,
-    max: 0,
-    step: 0.5,
-    neutral: -3,
-    unit: 'px',
-  },
-  {
     id: 'iconBlur',
     label: 'Icon swap blur',
     hint: 'Blur applied to the outgoing icon during a swap.',
@@ -249,8 +238,16 @@ export const neutralEffects: EffectValues = effectControls.reduce((acc, control)
   return acc;
 }, {} as EffectValues);
 
-/** Duration tokens scaled by the motion multiplier, with their shipped defaults in ms. */
+/**
+ * Duration tokens scaled by the motion multiplier, with their shipped defaults
+ * in ms. `--theme-motion-*` are consumed by Tailwind's `duration-*` utilities
+ * (see `tailwind.config.cjs`); the rest drive hand-written transitions in
+ * `style.css`.
+ */
 export const motionTokens: ReadonlyArray<readonly [string, number]> = [
+  ['theme-motion-fast', 150],
+  ['theme-motion-normal', 200],
+  ['theme-motion-slow', 300],
   ['resize-dur', 300],
   ['icon-swap-dur', 200],
   ['avatar-dur', 280],
