@@ -69,8 +69,11 @@ edit the other palette.
 Changes are written to a single `<style id="librechat-theme-lab">` element and
 persisted in `localStorage`, so they survive a reload. Nothing is sent anywhere.
 
-- **Copy CSS** gives you `html:not(.dark)` and `html.dark` blocks ready to paste
-  into `client/src/style.css` after the existing theme blocks.
+- **Copy CSS** gives you `html:not(.dark)` and `html.dark` blocks. Paste them at
+  the very end of `client/src/style.css`, at the top level — they are complete
+  rules, so dropping them inside an existing `html { }` or `.dark { }` block
+  nests them and the stylesheet fails to build. Hit **Reset** afterwards so the
+  theme comes from the file rather than from browser storage.
 - **Copy JSON** gives you the raw state, handy for converting into an `IThemeRGB`
   object for `packages/client/src/theme/themes/` or into `REACT_APP_THEME_*`
   environment variables.
