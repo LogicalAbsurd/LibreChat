@@ -206,24 +206,26 @@ describe('buildCss', () => {
     expect(buildCss(broken, false, 'triplet')).toBe('');
   });
 
-  it('rescales every radius step, not just the ones wired to --radius', () => {
+  it('publishes every radius step as a variable Tailwind reads', () => {
     const base = emptyState();
     const css = buildCss({ ...base, effects: { ...base.effects, radius: 1 } }, false);
 
     expect(css).toContain('--radius: 1rem;');
+    expect(css).toContain('--radius-sm: 0.25rem;');
+    expect(css).toContain('--radius-base: 0.5rem;');
+    expect(css).toContain('--radius-md: 0.75rem;');
+    expect(css).toContain('--radius-lg: 1rem;');
+    expect(css).toContain('--radius-xl: 1.5rem;');
+    expect(css).toContain('--radius-2xl: 2rem;');
+    expect(css).toContain('--radius-3xl: 3rem;');
     expect(css).toContain('--theme-control-radius: 1.5rem;');
-    expect(css).toContain('--theme-lab-radius: 1rem;');
     expect(css).toContain('--theme-surface-radius: 2rem;');
-    expect(css).toContain('.rounded-xl {');
-    expect(css).toContain('.rounded-2xl {');
-    expect(css).toContain('border-radius: 1.5rem;');
   });
 
-  it('leaves deliberate shapes alone', () => {
+  it('emits no per-class radius rules — Tailwind reads the variables directly', () => {
     const base = emptyState();
     const css = buildCss({ ...base, effects: { ...base.effects, radius: 1 } }, false);
-    expect(css).not.toContain('.rounded-full');
-    expect(css).not.toContain('.rounded-none');
+    expect(css).not.toContain('.rounded');
   });
 
   it('emits effect rules only when a control leaves its neutral value', () => {

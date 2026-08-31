@@ -73,30 +73,21 @@ function paletteRules(state: LabState, important: boolean, format: ChannelFormat
 }
 
 /**
- * Tailwind's radius scale, as multiples of `rounded-lg`. Only `lg`, `md` and
- * `sm` are wired to `--radius`; the rest are literals, so the slider has to
- * restate them or most of the UI ignores it. `full` and `none` are deliberate
- * shapes (avatars, pills, flush edges) and are left alone.
- */
-const RADIUS_SCALE: ReadonlyArray<readonly [string, number]> = [
-  ['sm', 0.25],
-  ['', 0.5],
-  ['md', 0.75],
-  ['lg', 1],
-  ['xl', 1.5],
-  ['2xl', 2],
-  ['3xl', 3],
-];
-
-/**
- * Radius variables the app's own theme layer reads, with their default ratios.
- * `--theme-lab-radius` is an escape hatch: an author rule that outranks the
- * lab can point at `var(--theme-lab-radius, <its own value>)` and follow the
- * slider without giving up its own default.
+ * Radius variables the slider drives. The Tailwind config maps every
+ * `rounded-*` utility (including directional and responsive variants) to these,
+ * so setting them here is enough to rescale the whole UI — no per-class rules
+ * needed. `--radius` and `--theme-*-radius` are kept for the upstream style
+ * layer that consumes them directly.
  */
 const RADIUS_VARS: ReadonlyArray<readonly [string, number]> = [
   ['radius', 1],
-  ['theme-lab-radius', 1],
+  ['radius-sm', 0.25],
+  ['radius-base', 0.5],
+  ['radius-md', 0.75],
+  ['radius-lg', 1],
+  ['radius-xl', 1.5],
+  ['radius-2xl', 2],
+  ['radius-3xl', 3],
   ['theme-control-radius', 1.5],
   ['theme-surface-radius', 2],
   ['theme-large-surface-radius', 3],
@@ -104,12 +95,6 @@ const RADIUS_VARS: ReadonlyArray<readonly [string, number]> = [
 
 const radiusVars = (radius: number, suffix: string): string[] =>
   RADIUS_VARS.map(([name, ratio]) => `  --${name}: ${round(radius * ratio)}rem${suffix};`);
-
-const radiusRules = (radius: number, suffix: string): string[] =>
-  RADIUS_SCALE.map(([step, ratio]) => {
-    const selector = step ? `.rounded-${step}` : '.rounded';
-    return `${selector} {\n  border-radius: ${round(radius * ratio)}rem${suffix};\n}`;
-  });
 
 function effectRules(effects: EffectValues, important: boolean, format: ChannelFormat): string[] {
   const suffix = important ? ' !important' : '';
@@ -136,10 +121,6 @@ function effectRules(effects: EffectValues, important: boolean, format: ChannelF
 
   if (rootVars.length) {
     rules.push(`html {\n${rootVars.join('\n')}\n}`);
-  }
-
-  if (!isNeutral('radius', effects.radius)) {
-    rules.push(...radiusRules(effects.radius, suffix));
   }
 
   const filters: string[] = [];
@@ -230,29 +211,6 @@ export function applyState(state: LabState): void {
   }
 
   element.textContent = buildCss(state, true, detectChannelFormat());
-}
-
-/**
- * Measures whether an author rule outranks the lab's radius override. A more
- * specific `!important` rule — LibreChat trees often carry hand-written ones
- * like `.dark [class*='rounded']` — silently wins, which reads as a dead
- * slider unless the panel says so.
- */
-export function radiusOverridden(radius: number): boolean {
-  const probe = document.createElement('div');
-  probe.className = 'rounded-xl';
-  probe.setAttribute('aria-hidden', 'true');
-  probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:0;height:0';
-  document.body.appendChild(probe);
-  const actual = parseFloat(getComputedStyle(probe).borderTopLeftRadius);
-  probe.remove();
-
-  if (!Number.isFinite(actual)) {
-    return false;
-  }
-
-  const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-  return Math.abs(actual - radius * 1.5 * rootSize) > 0.5;
 }
 
 export function clearOverrides(): void {

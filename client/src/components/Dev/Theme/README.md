@@ -81,34 +81,26 @@ persisted in `localStorage`, so they survive a reload. Nothing is sent anywhere.
 
 ## Radius and accent coverage
 
-Two host details the lab has to work around:
+**Radius.** `tailwind.config.cjs` maps every `rounded-*` utility — including
+directional variants (`rounded-t-*`, `rounded-tl-*`) and responsive ones
+(`sm:rounded-3xl`) — to a `--radius-<step>` variable. The slider rescales the
+whole scale by publishing those variables on `html`:
 
-**Radius.** Only `rounded-lg`, `rounded-md` and `rounded-sm` read `--radius`;
-`rounded-xl`, `rounded-2xl` and bare `rounded` are Tailwind literals, and newer
-trees add `--theme-control-radius` / `--theme-surface-radius` in a preset. Moving
-`--radius` alone leaves most of the UI unchanged, so the slider restates the
-whole scale proportionally and sets the theme radius variables too.
-`rounded-full` and `rounded-none` are deliberate shapes — avatars, pills, flush
-edges — and are left alone.
+| Variable         | Tailwind step | Default ratio |
+| ---------------- | ------------- | ------------- |
+| `--radius-sm`    | `rounded-sm`  | 0.25          |
+| `--radius-base`  | `rounded`     | 0.5           |
+| `--radius-md`    | `rounded-md`  | 0.75          |
+| `--radius-lg`    | `rounded-lg`  | 1             |
+| `--radius-xl`    | `rounded-xl`  | 1.5           |
+| `--radius-2xl`   | `rounded-2xl` | 2             |
+| `--radius-3xl`   | `rounded-3xl` | 3             |
 
-If a slider looks dead, check for a more specific `!important` rule in your own
-`style.css`. An author rule like `.dark [class*='rounded']` has specificity
-(0,2,0) against the lab's (0,1,0), so it wins regardless of what the lab emits.
-The panel detects this for corner radius and says so rather than looking broken.
-
-The lab deliberately does not escalate specificity to fight your own rules —
-that would win the preview but leave the exported CSS permanently at war with
-your customizations. Instead it publishes `--theme-lab-radius`, which such a
-rule can opt into while keeping its own default:
-
-```css
-.dark [class*='rounded'] {
-  border-radius: var(--theme-lab-radius, 1px) !important;
-}
-```
-
-With the slider at its neutral position the variable is never emitted, so the
-rule renders exactly as before. Move the slider and the rule follows it.
+`--radius` and `--theme-control-radius` / `--theme-surface-radius` /
+`--theme-large-surface-radius` are still set too, for the upstream style layer
+that reads them directly. `rounded-full` and `rounded-none` are deliberate
+shapes (avatars, pills, flush edges) and are Tailwind literals, so they stay
+put.
 
 **Accent.** Picking an accent moves the surface hue with it, so the whole theme
 retunes. The hue slider then decouples the two if you want neutrals tinted
