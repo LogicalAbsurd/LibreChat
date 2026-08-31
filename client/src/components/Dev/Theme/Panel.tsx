@@ -418,9 +418,10 @@ export default function Panel({ onClose }: PanelProps) {
             ))}
             {radiusBlocked && (
               <p className="tl-note tl-fail" role="status">
-                Corner radius is applying but something outranks it — usually a more specific
-                `!important` rule in style.css, such as `.dark [class*=&apos;rounded&apos;]`. Remove
-                or loosen that rule to preview radius changes.
+                Corner radius is applying but a more specific `!important` rule outranks it — such
+                as `.dark [class*=&apos;rounded&apos;]` in style.css. Point that rule&apos;s value
+                at `var(--theme-lab-radius, 1px)` and it will follow this slider while keeping its
+                own default.
               </p>
             )}
             <p className="tl-note">

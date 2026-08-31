@@ -192,6 +192,7 @@ describe('buildCss', () => {
 
     expect(css).toContain('--radius: 1rem;');
     expect(css).toContain('--theme-control-radius: 1.5rem;');
+    expect(css).toContain('--theme-lab-radius: 1rem;');
     expect(css).toContain('--theme-surface-radius: 2rem;');
     expect(css).toContain('.rounded-xl {');
     expect(css).toContain('.rounded-2xl {');

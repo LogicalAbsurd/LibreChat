@@ -91,9 +91,21 @@ edges — and are left alone.
 If a slider looks dead, check for a more specific `!important` rule in your own
 `style.css`. An author rule like `.dark [class*='rounded']` has specificity
 (0,2,0) against the lab's (0,1,0), so it wins regardless of what the lab emits.
-The panel now detects this for corner radius and says so rather than looking
-broken; the lab deliberately does not escalate specificity to fight your own
-customizations.
+The panel detects this for corner radius and says so rather than looking broken.
+
+The lab deliberately does not escalate specificity to fight your own rules —
+that would win the preview but leave the exported CSS permanently at war with
+your customizations. Instead it publishes `--theme-lab-radius`, which such a
+rule can opt into while keeping its own default:
+
+```css
+.dark [class*='rounded'] {
+  border-radius: var(--theme-lab-radius, 1px) !important;
+}
+```
+
+With the slider at its neutral position the variable is never emitted, so the
+rule renders exactly as before. Move the slider and the rule follows it.
 
 **Accent.** LibreChat is mostly neutral surfaces, so the accent lands on a
 limited set of elements: `text-accent-primary`, `bg-surface-submit`, links and
