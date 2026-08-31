@@ -88,9 +88,15 @@ const RADIUS_SCALE: ReadonlyArray<readonly [string, number]> = [
   ['3xl', 3],
 ];
 
-/** Radius variables the app's own theme layer reads, with their default ratios. */
+/**
+ * Radius variables the app's own theme layer reads, with their default ratios.
+ * `--theme-lab-radius` is an escape hatch: an author rule that outranks the
+ * lab can point at `var(--theme-lab-radius, <its own value>)` and follow the
+ * slider without giving up its own default.
+ */
 const RADIUS_VARS: ReadonlyArray<readonly [string, number]> = [
   ['radius', 1],
+  ['theme-lab-radius', 1],
   ['theme-control-radius', 1.5],
   ['theme-surface-radius', 2],
   ['theme-large-surface-radius', 3],
