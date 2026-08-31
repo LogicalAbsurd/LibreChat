@@ -109,7 +109,7 @@ export default function SkillFileEditor({ skillId, nodeId, fileName }: SkillFile
           className={cn(
             'size-full resize-none rounded-none border-0 bg-transparent px-4 py-3 font-mono text-[13px] leading-6 text-text-primary outline-none',
             'focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring-primary',
-            'selection:bg-blue-500/20',
+            'selection:bg-accent-primary/20',
           )}
           aria-label={`${localize('com_ui_edit')} ${fileName}`}
         />

@@ -599,7 +599,7 @@ const ChatForm = memo(function ChatForm({
                 isTextAreaFocused ? composerSurfaceShadow.focused : composerSurfaceShadow.blurred,
                 /* Temporary-chat accent is a ChatForm-only override, not part of
                    the shared composer-surface decision. */
-                isTemporary && 'border-violet-800/60 bg-violet-950/10',
+                isTemporary && 'border-accent-primary/60 bg-accent-primary/10',
               )}
             >
               {project ? <ProjectLandingChip project={project} /> : null}
