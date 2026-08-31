@@ -16,7 +16,7 @@ import {
 import { clearState, emptyState, loadState, saveState, stateFromSeed } from './store';
 import { colorGroups, effectControls, neutralEffects } from './tokens';
 import { contrastRatio, parseColor, toHex } from './color';
-import { presets, randomSeed } from './presets';
+import { presets, randomSeed, seedFromAccent } from './presets';
 
 const chrome = `
 .tl-root {
@@ -220,6 +220,10 @@ export default function Panel({ onClose }: PanelProps) {
     setState((current) => stateFromSeed({ ...current.seed, ...patch }, current.effects));
   }, []);
 
+  const updateAccent = useCallback((accent: string) => {
+    setState((current) => stateFromSeed(seedFromAccent(current.seed, accent), current.effects));
+  }, []);
+
   const setToken = useCallback(
     (name: string, value: string) => {
       setState((current) => ({
@@ -320,13 +324,13 @@ export default function Panel({ onClose }: PanelProps) {
                 className="tl-swatch"
                 type="color"
                 value={hexOf(state.seed.accent)}
-                onChange={(event) => updateSeed({ accent: event.target.value })}
+                onChange={(event) => updateAccent(event.target.value)}
                 aria-label="Accent colour"
               />
               <input
                 className="tl-hex"
                 value={state.seed.accent}
-                onChange={(event) => updateSeed({ accent: event.target.value })}
+                onChange={(event) => updateAccent(event.target.value)}
                 aria-label="Accent hex value"
               />
             </div>

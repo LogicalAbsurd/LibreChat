@@ -1,6 +1,6 @@
 import { buildCss } from '../apply';
 import { colorTokenNames } from '../tokens';
-import { buildPalette, presets } from '../presets';
+import { buildPalette, presets, seedFromAccent } from '../presets';
 import { emptyState, stateFromSeed } from '../store';
 import {
   contrastRatio,
@@ -146,6 +146,26 @@ describe('buildPalette', () => {
     const spread = (palette: Record<string, string>) =>
       hexToHsl(palette['text-primary'])!.l - hexToHsl(palette['surface-primary'])!.l;
     expect(spread(sharp)).toBeGreaterThan(spread(flat));
+  });
+});
+
+describe('seedFromAccent', () => {
+  it('moves the surface hue with the accent', () => {
+    const seed = seedFromAccent(presets[0].seed, '#e11d48');
+    expect(seed.hue).toBeCloseTo(hexToHsl('#e11d48')!.h, 5);
+    expect(seed.accent).toBe('#e11d48');
+  });
+
+  it('actually retints the neutrals, not just the accent tokens', () => {
+    const before = buildPalette(presets[0].seed, 'dark');
+    const after = buildPalette(seedFromAccent(presets[0].seed, '#e11d48'), 'dark');
+    expect(after['surface-primary']).not.toBe(before['surface-primary']);
+    expect(after['surface-secondary']).not.toBe(before['surface-secondary']);
+  });
+
+  it('keeps the previous hue when the accent cannot be parsed', () => {
+    const seed = seedFromAccent(presets[0].seed, '#zz');
+    expect(seed.hue).toBe(presets[0].seed.hue);
   });
 });
 

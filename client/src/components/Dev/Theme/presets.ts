@@ -128,6 +128,18 @@ export function buildPalette(seed: PaletteSeed, mode: ThemeMode): Record<string,
   return palette;
 }
 
+/**
+ * Retunes a seed to a new accent. The surface hue follows the accent, which is
+ * what picking an accent is understood to mean; the hue slider then decouples
+ * the two if you want tinted neutrals that differ from the accent. Without
+ * this the picker only moved the handful of accent-carrying tokens and read as
+ * doing nothing.
+ */
+export function seedFromAccent(seed: PaletteSeed, accent: string): PaletteSeed {
+  const hsl = hexToHsl(accent);
+  return hsl ? { ...seed, accent, hue: hsl.h } : { ...seed, accent };
+}
+
 export const presets: Preset[] = [
   {
     id: 'midnight',

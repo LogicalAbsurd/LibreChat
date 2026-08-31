@@ -107,10 +107,16 @@ rule can opt into while keeping its own default:
 With the slider at its neutral position the variable is never emitted, so the
 rule renders exactly as before. Move the slider and the rule follows it.
 
-**Accent.** LibreChat is mostly neutral surfaces, so the accent lands on a
-limited set of elements: `text-accent-primary`, `bg-surface-submit`, links and
-the focus ring. Most of what you see when you move the accent is the hue tint on
-the neutrals. Because those accent tokens are used as _text_ far more than as
+**Accent.** Picking an accent moves the surface hue with it, so the whole theme
+retunes. The hue slider then decouples the two if you want neutrals tinted
+differently from the accent.
+
+That coupling matters because LibreChat is mostly neutral surfaces: on its own
+the accent only reaches `text-accent-primary`, `bg-surface-submit`, links and
+the focus ring. If your `style.css` also pins those elements — a hardcoded
+`background-color: ... !important` on the send button, say — point them at
+`rgb(var(--surface-submit))` or `rgb(var(--accent-primary))` so they follow the
+theme too. Because those accent tokens are used as _text_ far more than as
 fills, generated accents and links are walked away from `surface-primary` until
 they clear 4.5:1 — a fixed lightness cannot guarantee that, since a green and a
 blue at the same HSL lightness are nowhere near equally readable.
