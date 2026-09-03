@@ -142,7 +142,7 @@ export const effectControls: EffectControl[] = [
   {
     id: 'motion',
     label: 'Motion speed',
-    hint: 'Multiplies every transition duration token. Lower is snappier.',
+    hint: 'Changes shared button, message and panel transition durations. Lower is snappier; hard-coded animations are unaffected.',
     min: 0,
     max: 3,
     step: 0.1,
@@ -182,7 +182,7 @@ export const effectControls: EffectControl[] = [
   {
     id: 'glow',
     label: 'Accent glow',
-    hint: 'Adds a brand-coloured halo to hovered and focused controls.',
+    hint: 'Adds a brand-coloured halo while buttons, links and fields are hovered or keyboard-focused.',
     min: 0,
     max: 1,
     step: 0.05,
@@ -192,7 +192,7 @@ export const effectControls: EffectControl[] = [
   {
     id: 'glass',
     label: 'Glass blur',
-    hint: 'Frosts dialogs, popovers and menus.',
+    hint: 'Frosts translucent dialogs, popovers and menus. It is most visible with page content behind them.',
     min: 0,
     max: 24,
     step: 1,
@@ -222,7 +222,7 @@ export const effectControls: EffectControl[] = [
   {
     id: 'iconBlur',
     label: 'Icon swap blur',
-    hint: 'Blur applied to the outgoing icon during a swap.',
+    hint: 'Blurs the outgoing half of paired save, copy and loading icon transitions. Static icons are unaffected.',
     min: 0,
     max: 8,
     step: 0.5,

@@ -71,6 +71,8 @@ const chrome = `
   color: #d8d8de;
   cursor: pointer;
   font-size: 11px;
+  transition: background-color var(--theme-motion-normal, 200ms),
+    border-color var(--theme-motion-normal, 200ms);
 }
 .tl-chip:hover { background: #2b2b32; }
 .tl-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -83,6 +85,8 @@ const chrome = `
   cursor: pointer;
   font-size: 11px;
   flex: 1;
+  transition: background-color var(--theme-motion-normal, 200ms),
+    border-color var(--theme-motion-normal, 200ms), color var(--theme-motion-normal, 200ms);
 }
 .tl-btn:hover { background: #2b2b32; }
 .tl-btn.tl-danger { border-color: #5a2b2b; color: #f0a5a5; }
@@ -122,6 +126,8 @@ const chrome = `
   cursor: pointer;
   font-size: 11px;
   font-weight: 600;
+  transition: background-color var(--theme-motion-normal, 200ms),
+    border-color var(--theme-motion-normal, 200ms);
 }
 .tl-group-body { display: flex; flex-direction: column; gap: 6px; padding: 8px 2px 2px; }
 .tl-foot {
@@ -407,6 +413,7 @@ export default function Panel({ onClose }: PanelProps) {
                   onChange={(event) => setEffect(control.id, Number(event.target.value))}
                   aria-label={control.label}
                 />
+                <p className="tl-note">{control.hint}</p>
               </div>
             ))}
             <p className="tl-note">

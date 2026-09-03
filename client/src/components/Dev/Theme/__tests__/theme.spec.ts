@@ -211,6 +211,7 @@ describe('buildCss', () => {
     const css = buildCss({ ...base, effects: { ...base.effects, radius: 1 } }, false);
 
     expect(css).toContain('--radius: 1rem;');
+    expect(css).toContain('--theme-lab-radius: 1rem;');
     expect(css).toContain('--radius-sm: 0.25rem;');
     expect(css).toContain('--radius-base: 0.5rem;');
     expect(css).toContain('--radius-md: 0.75rem;');
@@ -249,5 +250,15 @@ describe('buildCss', () => {
 
     const withFilter = { ...base, effects: { ...base.effects, saturation: 0 } };
     expect(buildCss(withFilter, false)).toContain('filter: saturate(0)');
+  });
+
+  it('reaches portaled overlays and previews accent glow inside the lab', () => {
+    const base = emptyState();
+    const glass = { ...base, effects: { ...base.effects, glass: 12 } };
+    const glow = { ...base, effects: { ...base.effects, glow: 0.5 } };
+
+    expect(buildCss(glass, false)).toContain('[role="dialog"]:not(.tl-root)');
+    expect(buildCss(glass, false)).not.toContain('#root :is([role="dialog"]');
+    expect(buildCss(glow, false)).toContain(':is(#root, .tl-root)');
   });
 });

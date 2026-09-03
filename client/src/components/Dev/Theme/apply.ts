@@ -81,6 +81,7 @@ function paletteRules(state: LabState, important: boolean, format: ChannelFormat
  */
 const RADIUS_VARS: ReadonlyArray<readonly [string, number]> = [
   ['radius', 1],
+  ['theme-lab-radius', 1],
   ['radius-sm', 0.25],
   ['radius-base', 0.5],
   ['radius-md', 0.75],
@@ -137,7 +138,7 @@ function effectRules(effects: EffectValues, important: boolean, format: ChannelF
     const spread = Math.round(4 + effects.glow * 20);
     const strength = Math.round(effects.glow * 70);
     rules.push(
-      '#root :is(button, a, [role="button"], input, textarea, select):is(:hover, :focus-visible) {\n' +
+      ':is(#root, .tl-root) :is(button, a, [role="button"], input, textarea, select):is(:hover, :focus-visible) {\n' +
         `  box-shadow: 0 0 ${spread}px color-mix(in srgb, ${colorRef('brand-purple', format)} ${strength}%, transparent)${suffix};\n` +
         '}',
     );
@@ -146,7 +147,7 @@ function effectRules(effects: EffectValues, important: boolean, format: ChannelF
   if (!isNeutral('glass', effects.glass)) {
     const opacity = Math.max(55, 92 - effects.glass * 1.6).toFixed(0);
     rules.push(
-      '#root :is([role="dialog"], [role="menu"], [role="listbox"], [data-radix-popper-content-wrapper] > *) {\n' +
+      ':is([role="dialog"]:not(.tl-root), [role="menu"], [role="listbox"], [data-radix-popper-content-wrapper] > *) {\n' +
         `  backdrop-filter: blur(${effects.glass}px)${suffix};\n` +
         `  background-color: color-mix(in srgb, ${colorRef('surface-dialog', format)} ${opacity}%, transparent)${suffix};\n` +
         '}',
